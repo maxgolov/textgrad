@@ -72,8 +72,8 @@ class GuidedTextualGradientDescent(TextualGradientDescent):
                 with guidance.user():
                     lm += tgd_prompt
                 with guidance.assistant():
-                    lm += "Reasoning: " + gen(name="reasoning", stop="\n", max_tokens=max_reasoning_tokens) + "\n"
-                    lm += new_variable_tags[0] + gen(name="improved_variable", stop=new_variable_tags[1], max_tokens=max_variable_tokens) + new_variable_tags[1]
+                    lm += "Reasoning: " + gen(name="reasoning", stop="\n", max_completion_tokens=max_reasoning_tokens) + "\n"
+                    lm += new_variable_tags[0] + gen(name="improved_variable", stop=new_variable_tags[1], max_completion_tokens=max_variable_tokens) + new_variable_tags[1]
                 return lm
             structured_response = self.engine.generate_structured(structured_tgd_response, tgd_prompt=prompt_update_parameter)
             new_value = structured_response["improved_variable"]

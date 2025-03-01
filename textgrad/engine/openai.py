@@ -78,7 +78,7 @@ class ChatOpenAI(EngineLM, CachedEngine):
             return self._generate_from_multiple_input(content, system_prompt=system_prompt, **kwargs)
 
     def _generate_from_single_prompt(
-        self, prompt: str, system_prompt: str=None, temperature=0, max_tokens=2000, top_p=0.99
+        self, prompt: str, system_prompt: str=None, max_completion_tokens=4000
     ):
 
         sys_prompt_arg = system_prompt if system_prompt else self.system_prompt
@@ -96,9 +96,7 @@ class ChatOpenAI(EngineLM, CachedEngine):
             frequency_penalty=0,
             presence_penalty=0,
             stop=None,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            top_p=top_p,
+            max_completion_tokens=max_completion_tokens
         )
 
         response = response.choices[0].message.content
@@ -133,7 +131,7 @@ class ChatOpenAI(EngineLM, CachedEngine):
         return formatted_content
 
     def _generate_from_multiple_input(
-        self, content: List[Union[str, bytes]], system_prompt=None, temperature=0, max_tokens=2000, top_p=0.99
+        self, content: List[Union[str, bytes]], system_prompt=None, max_completion_tokens=2000
     ):
         sys_prompt_arg = system_prompt if system_prompt else self.system_prompt
         formatted_content = self._format_content(content)
@@ -149,9 +147,7 @@ class ChatOpenAI(EngineLM, CachedEngine):
                 {"role": "system", "content": sys_prompt_arg},
                 {"role": "user", "content": formatted_content},
             ],
-            temperature=temperature,
-            max_tokens=max_tokens,
-            top_p=top_p,
+            max_completion_tokens=max_completion_tokens
         )
 
         response_text = response.choices[0].message.content

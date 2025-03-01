@@ -43,7 +43,7 @@ class OpenAIEngine(EngineLM):
             raise ValueError(
                 "Please set the OPENAI_API_KEY environment variable if you'd like to use OpenAI models.")
 
-    def openai_call(self, user_content, system_prompt, temperature, max_tokens, top_p):
+    def openai_call(self, user_content, system_prompt, temperature, max_completion_tokens):
         response = self.client.chat.completions.create(
             model=self.model_string,
             messages=[
@@ -54,8 +54,7 @@ class OpenAIEngine(EngineLM):
             presence_penalty=0,
             stop=None,
             temperature=temperature,
-            max_tokens=max_tokens,
-            top_p=top_p,
+            max_completion_tokens=max_completion_tokens
         )
 
         return response.choices[0].message.content
@@ -63,19 +62,19 @@ class OpenAIEngine(EngineLM):
     @cached
     @retry(wait=wait_random_exponential(min=1, max=5), stop=stop_after_attempt(3))
     def _generate_from_single_prompt(
-            self, content: str, system_prompt: str = None, temperature=0, max_tokens=2000, top_p=0.99
+            self, content: str, system_prompt: str = None, temperature=0, max_completion_tokens=4000
     ):
 
-        return self.openai_call(content, system_prompt, temperature, max_tokens, top_p)
+        return self.openai_call(content, system_prompt, temperature, max_completion_tokens)
 
     @cached
     @retry(wait=wait_random_exponential(min=1, max=5), stop=stop_after_attempt(3))
     def _generate_from_multiple_input(
-            self, content: List[Union[str, bytes]], system_prompt=None, temperature=0, max_tokens=2000, top_p=0.99
+            self, content: List[Union[str, bytes]], system_prompt=None, temperature=0, max_completion_tokens=4000
     ):
         formatted_content = open_ai_like_formatting(content)
 
-        return self.openai_call(formatted_content, system_prompt, temperature, max_tokens, top_p)
+        return self.openai_call(formatted_content, system_prompt, temperature, max_completion_tokens)
 
     def __call__(self, content, **kwargs):
         return self.generate(content, **kwargs)
